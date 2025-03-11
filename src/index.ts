@@ -32,7 +32,7 @@ app.post('/ai-code', async (req: Request, res: Response):Promise<any> => {
             res.json({ text: responseText });
         }
     } catch (error: any) {
-        console.error("Error:", error);
+        console.error("Error:");
         res.status(500).json({ 
             error: "Error sending message", 
             details: error?.message || "Unknown error" 
