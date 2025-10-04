@@ -13,10 +13,6 @@ const groundingTool = {
   googleSearch: {},
 };
 
-const config = {
-  tools: [groundingTool],
-};
-
 const generationConfig = {
   temperature: 1,
   topP: 0.95,
@@ -30,7 +26,7 @@ const CodeGenerationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "application/json",
-  config,
+  tools: [groundingTool],
 };
 
 export const chatSession = model.startChat({
