@@ -6,8 +6,16 @@ const apiKey = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+  model: "gemini-2.5-flash",
 });
+
+const groundingTool = {
+  googleSearch: {},
+};
+
+const config = {
+  tools: [groundingTool],
+};
 
 const generationConfig = {
   temperature: 1,
@@ -22,6 +30,7 @@ const CodeGenerationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "application/json",
+  config,
 };
 
 export const chatSession = model.startChat({
