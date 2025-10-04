@@ -26,7 +26,7 @@ const CodeGenerationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "application/json",
-  tools: [groundingTool],
+  // tools: [groundingTool],
 };
 
 export const chatSession = model.startChat({
