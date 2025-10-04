@@ -1,7 +1,8 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-import dotenv from 'dotenv';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
 
 dotenv.config();
+
 const apiKey = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -9,47 +10,63 @@ const model = genAI.getGenerativeModel({
   model: "gemini-2.5-flash",
 });
 
+// Enable Google Search grounding
 const groundingTool = {
   googleSearch: {},
 };
 
+// General generation settings
 const generationConfig = {
   temperature: 1,
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "text/plain",
+  tools: [groundingTool], // ✅ Google Search enabled here
 };
+
 const CodeGenerationConfig = {
   temperature: 1,
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "application/json",
-  // tools: [groundingTool],
+  tools: [groundingTool], // ✅ Enable it for code generation too if needed
 };
 
+// Create chat session for general text generation
 export const chatSession = model.startChat({
   generationConfig,
   history: [],
 });
 
-// const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-// console.log(result.response.text());
-
+// Create a chat session for structured code generation
 export const GenAICode = model.startChat({
   generationConfig: CodeGenerationConfig,
   history: [
     {
       role: "user",
       parts: [
-        {text: "Generate a Project in React app. Create multiple components, organizing them in separate folders with filenames using the .js extension, if needed. The output should use Tailwind CSS for styling, \nwithout any third-party dependencies or libraries, except for icons from the lucide-react library, which should only be used when necessary. Available icons include: Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, and ArrowRight. For example, you can import an icon as import { Heart } from \"lucide-react\" and use it in JSX as <Heart className=\"\" />.\nalso you can use date-fns for date format and react-chartjs-2 chart, graph library\n\nReturn the response in JSON format with the following schema:\n{\n  \"projectTitle\": \"\",\n  \"explanation\": \"\",\n  \"files\": {\n    \"/App.js\": {\n      \"code\": \"\"\n    },\n    ...\n  },\n  \"generatedFiles\": []\n}\n\nHere’s the reformatted and improved version of your prompt:\n\nGenerate a programming code structure for a React project using Vite. Create multiple components, organizing them in separate folders with filenames using the .js extension, if needed. The output should use Tailwind CSS for styling, without any third-party dependencies or libraries, except for icons from the lucide-react library, which should only be used when necessary. Available icons include: Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, and ArrowRight. For example, you can import an icon as import { Heart } from \"lucide-react\" and use it in JSX as <Heart className=\"\" />.\n\nReturn the response in JSON format with the following schema:\n\njson\nCopy code\n{\n  \"projectTitle\": \"\",\n  \"explanation\": \"\",\n  \"files\": {\n    \"/App.js\": {\n      \"code\": \"\"\n    },\n    ...\n  },\n  \"generatedFiles\": []\n}\nEnsure the files field contains all created files, and the generatedFiles field lists all the filenames. Each file's code should be included in the code field, following this example:\nfiles:{\n  \"/App.js\": {\n    \"code\": \"import React from 'react';\\nimport './styles.css';\\nexport default function App() {\\n  return (\\n    <div className='p-4 bg-gray-100 text-center'>\\n      <h1 className='text-2xl font-bold text-blue-500'>Hello, Tailwind CSS with Sandpack!</h1>\\n      <p className='mt-2 text-gray-700'>This is a live code editor.</p>\\n    </div>\\n  );\\n}\"\n  }\n}\n  Additionally, include an explanation of the project's structure, purpose, and functionality in the explanation field. Make the response concise and clear in one paragraph.\n  - When asked then only use this package to import, here are some packages available to import and use (date-fns, chart.js, react-chartjs-2) only when it required\n  \n  - For placeholder images, please use a https://archive.org/download/placeholder-image/placeholder-image.jpg\n  -Add Emoji icons whenever needed to give good user experinence\n  - all designs I ask you to make, have them be beautiful, not cookie cutter. Make webpages that are fully featured and worthy for production.\n\n- By default, this template supports JSX syntax with Tailwind CSS classes, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.\n\n- Use icons from lucide-react for logos only when needed.\n- use shadows and cards\n- proper spacing between elements and padding\n- don't create src folder\n- after creating the project, update package.json file \n- get images from web/internet but only working not broken\n-  Do not download the images, only link to them in image tags.\n"},
-      ],
+        {
+          text: `Generate a Project in React app. Create multiple components, organizing them in separate folders with filenames using the .js extension, if needed. The output should use Tailwind CSS for styling, 
+without any third-party dependencies or libraries, except for icons from the lucide-react library, which should only be used when necessary. Available icons include: Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, and ArrowRight.
+For example, you can import an icon as import { Heart } from "lucide-react" and use it in JSX as <Heart className="" />.
+also you can use date-fns for date format and react-chartjs-2 chart, graph library.
+
+Return the response in JSON format with the following schema:
+{
+  "projectTitle": "",
+  "explanation": "",
+  "files": {
+    "/App.js": {
+      "code": ""
     },
-    {
-      role: "model",
-      parts: [
-        {text: "```json\n{\n  \"projectTitle\": \"Dashboard App\",\n  \"explanation\": \"This React project creates a simple dashboard application. It utilizes Tailwind CSS for styling, offering a modern and responsive user interface. The project is structured with separate components for different sections of the dashboard, like the sidebar, header, and main content area. The dashboard showcases various data points and insights, presented using charts (react-chartjs-2) and formatted dates (date-fns). Lucide React icons are used to enhance the visual appeal and user experience. The layout includes a sidebar for navigation, a header for quick actions, and a main content area for displaying information. All components are designed with responsiveness and a focus on providing an intuitive user experience. Project uses shadow-lg to make the card stand out.\",\n  \"files\": {\n    \"/App.js\": {\n      \"code\": \"import React from 'react';\\nimport Sidebar from './components/Sidebar/Sidebar';\\nimport Header from './components/Header/Header';\\nimport MainContent from './components/MainContent/MainContent';\\n\\nfunction App() {\\n  return (\\n    <div className=\\\"flex h-screen bg-gray-100\\\">\\n      <Sidebar />\\n      <div className=\\\"flex-1 flex flex-col overflow-hidden\\\">\\n        <Header />\\n        <MainContent />\\n      </div>\\n    </div>\\n  );\\n}\\n\\nexport default App;\"\n    },\n    \"/components/Sidebar/Sidebar.js\": {\n      \"code\": \"import React from 'react';\\nimport { Home, Users, Settings, Mail, Bell } from 'lucide-react';\\n\\nfunction Sidebar() {\\n  return (\\n    <div className=\\\"bg-white w-64 flex-shrink-0 border-r border-gray-200\\\">\\n      <div className=\\\"h-16 flex items-center justify-center shadow-md\\\">\\n        <span className=\\\"text-lg font-semibold text-gray-700\\\">Dashboard 🚀</span>\\n      </div>\\n      <div className=\\\"p-4\\\">\\n        <ul>\\n          <li className=\\\"flex items-center py-2 px-4 rounded hover:bg-gray-100\\\">\\n            <Home className=\\\"mr-2 h-5 w-5 text-gray-500\\\" />\\n            <a href=\\\"#\\\" className=\\\"text-gray-700\\\">Home</a>\\n          </li>\\n          <li className=\\\"flex items-center py-2 px-4 rounded hover:bg-gray-100\\\">\\n            <Users className=\\\"mr-2 h-5 w-5 text-gray-500\\\" />\\n            <a href=\\\"#\\\" className=\\\"text-gray-700\\\">Users</a>\\n          </li>\\n          <li className=\\\"flex items-center py-2 px-4 rounded hover:bg-gray-100\\\">\\n            <Settings className=\\\"mr-2 h-5 w-5 text-gray-500\\\" />\\n            <a href=\\\"#\\\" className=\\\"text-gray-700\\\">Settings</a>\\n          </li>\\n          <li className=\\\"flex items-center py-2 px-4 rounded hover:bg-gray-100\\\">\\n            <Mail className=\\\"mr-2 h-5 w-5 text-gray-500\\\" />\\n            <a href=\\\"#\\\" className=\\\"text-gray-700\\\">Messages</a>\\n          </li>\\n          <li className=\\\"flex items-center py-2 px-4 rounded hover:bg-gray-100\\\">\\n            <Bell className=\\\"mr-2 h-5 w-5 text-gray-500\\\" />\\n            <a href=\\\"#\\\" className=\\\"text-gray-700\\\">Notifications</a>\\n          </li>\\n        </ul>\\n      </div>\\n    </div>\\n  );\\n}\\n\\nexport default Sidebar;\"\n    },\n    \"/components/Header/Header.js\": {\n      \"code\": \"import React from 'react';\\nimport { Search, User, Bell } from 'lucide-react';\\n\\nfunction Header() {\\n  return (\\n    <div className=\\\"bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4\\\">\\n      <div className=\\\"flex items-center\\\">\\n        <div className=\\\"relative\\\">\\n          <input type=\\\"text\\\" placeholder=\\\"Search...\\\" className=\\\"border border-gray-300 rounded-md py-2 px-8 pl-10 focus:outline-none focus:border-blue-500\\\" />\\n          <Search className=\\\"absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400\\\" />\\n        </div>\\n      </div>\\n      <div className=\\\"flex items-center\\\">\\n        <Bell className=\\\"mr-4 h-6 w-6 text-gray-500 hover:text-gray-700 cursor-pointer\\\" />\\n        <div className=\\\"flex items-center\\\">\\n          <img src=\\\"https://archive.org/download/placeholder-image/placeholder-image.jpg\\\" alt=\\\"User Avatar\\\" className=\\\"rounded-full h-8 w-8 mr-2\\\" />\\n          <span className=\\\"text-gray-700 font-semibold\\\">John Doe</span>\\n        </div>\\n      </div>\\n    </div>\\n  );\\n}\\n\\nexport default Header;\"\n    },\n    \"/components/MainContent/MainContent.js\": {\n      \"code\": \"import React from 'react';\\nimport { Calendar, Clock, ArrowRight, Star, Users } from 'lucide-react';\\nimport { format } from 'date-fns';\\nimport { Line } from 'react-chartjs-2';\\nimport { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';\\nChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);\\n\\n\\nfunction MainContent() {\\n  const now = new Date();\\n  const formattedDate = format(now, 'PPP');\\n  const formattedTime = format(now, 'h:mm a');\\n\\n  const chartData = {\\n    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],\\n    datasets: [\\n      {\\n        label: 'Sales Data',\\n        data: [65, 59, 80, 81, 56, 55, 40, 68, 98, 76, 88, 90],\\n        fill: true,\\n        backgroundColor: 'rgba(75,192,192,0.2)',\\n        borderColor: 'rgba(75,192,192,1)',\\n        tension: 0.4\\n      },\\n    ],\\n  };\\n\\n  const chartOptions = {\\n    responsive: true,\\n    plugins: {\\n      legend: {\\n        display: false,\\n      },\\n      title: {\\n        display: false,\\n      },\\n    },\\n    scales: {\\n      y: {\\n        beginAtZero: true,\\n      },\\n    },\\n  };\\n\\n\\n  return (\\n    <div className=\\\"p-6 bg-gray-100\\\">\\n      <div className=\\\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\\\">\\n        {/* Date and Time Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4 flex items-center\\\">\\n          <Calendar className=\\\"mr-4 h-8 w-8 text-blue-500\\\" />\\n          <div>\\n            <h2 className=\\\"text-lg font-semibold text-gray-700\\\">Today</h2>\\n            <p className=\\\"text-gray-500\\\">{formattedDate}</p>\\n          </div>\\n          <div className=\\\"ml-auto\\\">\\n            <Clock className=\\\"mr-4 h-8 w-8 text-blue-500\\\" />\\n            <p className=\\\"text-gray-500\\\">{formattedTime}</p>\\n          </div>\\n        </div>\\n\\n        {/* Welcome Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4\\\">\\n          <h2 className=\\\"text-lg font-semibold text-gray-700\\\">Welcome Back 👋</h2>\\n          <p className=\\\"text-gray-500\\\">Check out today's updates!</p>\\n          <button className=\\\"mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\\\">\\n            View Updates <ArrowRight className=\\\"inline-block ml-2\\\" />\\n          </button>\\n        </div>\\n\\n        {/* Rating Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4 flex items-center\\\">\\n          <Star className=\\\"mr-4 h-8 w-8 text-yellow-500\\\" />\\n          <div>\\n            <h2 className=\\\"text-lg font-semibold text-gray-700\\\">Ratings</h2>\\n            <p className=\\\"text-gray-500\\\">4.8 / 5</p>\\n          </div>\\n        </div>\\n\\n        {/* Total Users Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4 flex items-center\\\">\\n          <Users className=\\\"mr-4 h-8 w-8 text-green-500\\\" />\\n          <div>\\n            <h2 className=\\\"text-lg font-semibold text-gray-700\\\">Total Users</h2>\\n            <p className=\\\"text-gray-500\\\">500+</p>\\n          </div>\\n        </div>\\n\\n        {/* Placeholder Image Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4\\\">\\n          <img src=\\\"https://archive.org/download/placeholder-image/placeholder-image.jpg\\\" alt=\\\"Placeholder\\\" className=\\\"w-full h-48 object-cover rounded-md\\\" />\\n          <p className=\\\"mt-2 text-gray-500\\\">A sample image to showcase content.</p>\\n        </div>\\n\\n        {/* Chart Card */}\\n        <div className=\\\"bg-white shadow-lg rounded-md p-4\\\">\\n          <h2 className=\\\"text-lg font-semibold text-gray-700 mb-4\\\">Monthly Sales</h2>\\n          <Line data={chartData} options={chartOptions} />\\n        </div>\\n      </div>\\n    </div>\\n  );\\n}\\n\\nexport default MainContent;\"\n    },\n    \"/package.json\": {\n      \"code\": \"{\\n  \\\"name\\\": \\\"dashboard-app\\\",\\n  \\\"private\\\": true,\\n  \\\"version\\\": \\\"0.1.0\\\",\\n  \\\"dependencies\\\": {\\n    \\\"react\\\": \\\"^18.2.0\\\",\\n    \\\"react-dom\\\": \\\"^18.2.0\\\",\\n    \\\"lucide-react\\\": \\\"^0.303.0\\\",\\n    \\\"date-fns\\\": \\\"^2.29.3\\\",\\n    \\\"chart.js\\\": \\\"^4.4.1\\\",\\n    \\\"react-chartjs-2\\\": \\\"^5.2.0\\\"\\n  },\\n  \\\"devDependencies\\\": {\\n    \\\"@vitejs/plugin-react\\\": \\\"^3.1.0\\\",\\n    \\\"autoprefixer\\\": \\\"^10.4.13\\\",\\n    \\\"postcss\\\": \\\"^8.4.21\\\",\\n    \\\"tailwindcss\\\": \\\"^3.2.6\\\",\\n    \\\"vite\\\": \\\"^4.2.0\\\"\\n  },\\n  \\\"scripts\\\": {\\n    \\\"dev\\\": \\\"vite\\\",\\n    \\\"build\\\": \\\"vite build\\\",\\n    \\\"serve\\\": \\\"vite preview\\\"\\n  },\\n  \\\"browserslist\\\": [\\n    \\\">0.2%\\\",\\n    \\\"not dead\\\",\\n    \\\"not ie <= 11\\\",\\n    \\\"not op_mini all\\\"\\n  ]\\n}\"\n    }\n  },\n  \"generatedFiles\": [\n    \"/App.js\",\n    \"/components/Sidebar/Sidebar.js\",\n    \"/components/Header/Header.js\",\n    \"/components/MainContent/MainContent.js\",\n     \"/package.json\"\n  ]\n}\n```"},
+    ...
+  },
+  "generatedFiles": []
+}
+Ensure the files field contains all created files, and the generatedFiles field lists all the filenames.`,
+        },
       ],
     },
   ],
