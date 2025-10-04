@@ -23,7 +23,7 @@ const generationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "text/plain",
-  tools: [groundingTool], // ✅ Google Search enabled here
+  // tools: [groundingTool], // ✅ Google Search enabled here
 };
 
 const CodeGenerationConfig = {
@@ -32,7 +32,7 @@ const CodeGenerationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: "application/json",
-  tools: [groundingTool], // ✅ Enable it for code generation too if needed
+  // tools: [groundingTool], // ✅ Enable it for code generation too if needed
 };
 
 // Create chat session for general text generation
