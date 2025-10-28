@@ -7,7 +7,7 @@ const apiKey = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash", // Confirmed for October 2025
+  model: "gemini-2.0-flash", // Confirmed for October 2025
 });
 
 // const groundingTool = {
