@@ -46,26 +46,26 @@ export const GenAICode = model.startChat({
       role: "user",
       parts: [
         {
-          text:
-            `Generate a Project in React app. Create multiple components, organizing them in separate folders with filenames using the .js extension, if needed. The output should use Tailwind CSS for styling, without any third-party dependencies or libraries, except for icons from the lucide-react library, which should only be used when necessary. Available icons include: Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, and ArrowRight. For example, you can import an icon as import { Heart } from "lucide-react" and use it in JSX as <Heart className="" />.
-            Also you can use date-fns for date format and react-chartjs-2 chart, graph library.
-            Generate a Project in React app...
-Return ONLY a valid JSON object following this schema exactly:
+          text: `
+Generate a React app project. Create multiple components, organize in separate folders with .js files as needed. Use Tailwind CSS. Use only 'lucide-react' icons when needed and 'date-fns', 'react-chartjs-2' ONLY if necessary.
+
+Respond ONLY with valid JSON:
 {
   "projectTitle": "",
   "explanation": "",
-  "files": {
-    "/App.js": { "code": "" },
-    ...
-  },
+  "files": { "/App.js": { "code": "" }, ... },
   "generatedFiles": []
 }
-Do NOT wrap the JSON inside quotes.
-Do NOT escape characters or include \\n or \\\".
-Return the JSON object directly, not as a string.
-            `
-        },
-      ],
-    },
-  ],
-});
+- Do NOT wrap JSON in quotes or escape
+- Do NOT include \\n or \\"
+- Only link to remote images (no downloads)
+- Add emoji icons for UX if needed
+- Make design visually impressive (spacing, padding, shadows, cards, lucide-react icons as logos if needed)
+- Exclude 'src' folder, update package.json if project created
+`
+          },
+        ]
+      }
+    ]
+  });
+}
