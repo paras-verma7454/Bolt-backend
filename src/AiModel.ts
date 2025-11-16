@@ -5,8 +5,16 @@ dotenv.config();
 const apiKey = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenerativeAI(apiKey);
 
+const tools = [
+  {
+    googleSearch: {
+    }
+  },
+];
+
 const model = genAI.getGenerativeModel({
   model: "gemini-2.5-flash",
+  tools: tools,
 });
 
 // const generationConfig = {
