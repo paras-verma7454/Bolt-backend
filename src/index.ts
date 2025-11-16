@@ -25,8 +25,8 @@ app.post('/ai-code', async (req: Request, res: Response):Promise<any> => {
         
         try {
             // The response might be wrapped in ```json ... ```
-            const cleanedText = responseText.replace(/^```json\s*/, '').replace(/```$/, '');
-            const jsonResponse = JSON.parse(cleanedText);
+            // const cleanedText = responseText.replace(/^```json\s*/, '').replace(/```$/, '');
+            const jsonResponse = JSON.parse(responseText);
             res.json(jsonResponse);
         } catch (parseError) {
             // If parsing fails, send the raw text
