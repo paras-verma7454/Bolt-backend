@@ -30,7 +30,7 @@ app.post('/ai-code', async (req: Request, res: Response):Promise<any> => {
             res.json(jsonResponse);
         } catch (parseError) {
             // If parsing fails, send the raw text
-            res.json({ text: responseText });
+            res.json({ text: JSON.parse(responseText) });
         }
     } catch (error: any) {
         console.error("Error in /ai-code:", error);
