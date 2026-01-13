@@ -8,45 +8,46 @@ dotenv.config();
 
 const app = express();
 
-app.use(
+const githubWebhookJson: RequestHandler = express.json({
+  verify: (req: any, _res, buf) => {
+    req.rawBody = buf;
+  },
+});
+
+app.post(
   "/webhooks/github",
-  express.json({
-    verify: (req: any, _res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
+  githubWebhookJson,
+  (req: Request & { rawBody?: Buffer }, res: Response) => {
+    const signature = req.headers["x-hub-signature-256"] as string | undefined;
+    const event = req.headers["x-github-event"];
+    const secret = process.env.GITHUB_WEBHOOK_SECRET;
 
-app.post("/webhooks/github", (req: any, res: Response) => {
-  const signature = req.headers["x-hub-signature-256"];
-  const event = req.headers["x-github-event"];
-  const secret = "MergeGuard";
+    if (!signature || !secret || !req.rawBody) {
+      return res.status(401).send("Missing signature or secret");
+    }
 
-  if (!signature || !secret) {
-    return res.status(401).send("Missing signature or secret");
-  }
+    const hmac = crypto.createHmac("sha256", secret);
+    const digest =
+      "sha256=" + hmac.update(req.rawBody).digest("hex");
 
-  const hmac = crypto.createHmac("sha256", secret);
-  const digest =
-    "sha256=" + hmac.update(req.rawBody).digest("hex");
-
-  if (
-    !crypto.timingSafeEqual(
+    const isValid = crypto.timingSafeEqual(
       Buffer.from(signature),
       Buffer.from(digest)
-    )
-  ) {
-    return res.status(401).send("Invalid signature");
+    );
+
+    if (!isValid) {
+      return res.status(401).send("Invalid signature");
+    }
+
+    console.log("✅ GitHub webhook received:", event);
+
+    // IMPORTANT:
+    // Do NOT call AI here
+    // Do NOT do heavy work here
+
+    return res.status(200).send("ok");
   }
-
-  console.log("✅ GitHub webhook received:", event);
-
-  // 🚫 DO NOT call AI here
-  // 🚫 DO NOT do heavy work
-  // 🚫 DO NOT store secrets
-
-  return res.status(200).send("ok");
-});
+);
 
 app.use(express.json());
 app.use(cors());
