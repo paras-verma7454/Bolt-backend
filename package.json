@@ -29,11 +29,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "mime": "^4.1.0",
-
-    /* 🔐 GitHub webhook & security */
     "crypto": "^1.0.1",
-
-    /* 🧰 Utility (optional but useful) */
     "zod": "^3.23.8"
   }
 }
