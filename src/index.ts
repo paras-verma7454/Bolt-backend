@@ -19,7 +19,7 @@ app.use(
 app.post("/webhooks/github", (req: any, res: Response) => {
   const signature = req.headers["x-hub-signature-256"];
   const event = req.headers["x-github-event"];
-  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  const secret = "MergeGuard";
 
   if (!signature || !secret) {
     return res.status(401).send("Missing signature or secret");
