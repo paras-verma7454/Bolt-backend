@@ -13,7 +13,7 @@ const tools = [
 ];
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash"
+  model: "gemini-3-flash-preview"
 });
 
 // const generationConfig = {
@@ -25,9 +25,9 @@ const model = genAI.getGenerativeModel({
 // };
 const CodeGenerationConfig = {
   temperature: 1,
-  topP: 0.95,
-  topK: 40,
-  maxOutputTokens: 8192,
+  // topP: 0.95,
+  // topK: 40,
+  // maxOutputTokens: 60000,
   responseMimeType: "application/json",
 };
 
